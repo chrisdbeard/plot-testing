@@ -52,7 +52,7 @@ fn generate_surface_plot_json() -> Value {
         )
         .z_axis(
             Axis::new()
-                .title("Signal Stregnth (dB)")
+                .title("Signal Strength (dB)")
                 .tick_color("white")
                 .grid_color("lightgrey"),
         );
@@ -96,7 +96,7 @@ fn generate_plot_data() -> (Vec<f64>, Vec<f64>, Vec<Vec<f64>>) {
 
     for ((i, j), elem) in signal_mut.indexed_iter_mut() {
         let angle = angles[i];
-        let t = time[j];
+        let t: f64 = time[j];
         let value = 70.0
             + 10.0 * (angle.to_radians() / 90.0).sin() * (t / 300.0).cos()
             + 5.0 * rand::random::<f64>();
