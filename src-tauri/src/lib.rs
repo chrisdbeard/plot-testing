@@ -126,3 +126,57 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_plot_json_structure() {
+        let plot_json = generate_plot_json();
+
+        // Check that it's an Object
+        assert!(plot_json.is_object(), "Expected a JSON object");
+
+        // Check that "data" field exists
+        let data = plot_json
+            .get("data")
+            .expect("Expected 'data' field in plot JSON");
+        assert!(data.is_array(), "'data' field should be an array");
+
+        let traces = data.as_array().unwrap();
+        assert_eq!(traces.len(), 1, "Expected exactly one trace");
+
+        // Check the first trace fields
+        let trace = &traces[0];
+        assert!(trace.get("x").is_some(), "Trace should have an 'x' field");
+        assert!(trace.get("y").is_some(), "Trace should have a 'y' field");
+        assert_eq!(
+            trace.get("type").unwrap().as_str().unwrap(),
+            "scatter",
+            "Trace type should be 'scatter'"
+        );
+
+        // Check x and y values
+        let x_values = trace.get("x").unwrap().as_array().unwrap();
+        let y_values = trace.get("y").unwrap().as_array().unwrap();
+
+        assert_eq!(
+            x_values
+                .iter()
+                .map(|v| v.as_i64().unwrap())
+                .collect::<Vec<_>>(),
+            vec![1, 2, 3, 4, 5],
+            "X values do not match expected"
+        );
+
+        assert_eq!(
+            y_values
+                .iter()
+                .map(|v| v.as_i64().unwrap())
+                .collect::<Vec<_>>(),
+            vec![10, 15, 7, 20, 5],
+            "Y values do not match expected"
+        );
+    }
+}
